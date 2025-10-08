@@ -16,8 +16,12 @@ const login = async (req, res) => {
         const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '10d' })
         return res.status(200).json({ success: true, token, user: { _id: user._id, name: user.name, role: user.role } })
     } catch (error) {
-        console.log(error)
+        return res.status(500).json({ success: false, error: error.message })
     }
 }
 
-export { login }
+const verify = async (req, res) => {
+    return res.status(200).json({ success: true, user: req.user })
+}
+
+export { login, verify }
