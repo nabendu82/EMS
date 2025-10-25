@@ -1,43 +1,52 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const UserContext = createContext()
 
 const AuthContext = ({ children }) => {
     const [user, setUser] = useState(null)
-    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const verifyUser = async () => {
+            setLoading(true)
             try {
                 const token = localStorage.getItem("token")
-                if(!token) {
-                    navigate("/login")
-                }
-                const response = await axios.get("http://localhost:3000/api/auth/verify", {
-                    headers: { Authorization: `Bearer ${token}` }
-                })
-                if(response.data.success) {
-                    setUser(response.data.user)
+                if(token) {
+                    const response = await axios.get("http://localhost:3000/api/auth/verify", {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                    if(response.data.success) {
+                        setUser(response.data.user)
+                    } else {
+                        setUser(null)
+                        localStorage.removeItem("token")
+                    }
+                } else {
+                    setUser(null)
                 }
             } catch (error) {
-                if(error.response && !error.response.data.error) {
-                    navigate("/login")
-                }
+                setUser(null)
+                localStorage.removeItem("token")
+            } finally {
+                setLoading(false)
             }
         }
         verifyUser()
     }, [])
 
-    const login = user => setUser(user)
+    const login = (user) => {
+        setUser(user)
+        setLoading(false)
+    }
 
     const logout = () => {
         setUser(null)
+        setLoading(false)
         localStorage.removeItem("token")
     }
     return (
-        <UserContext.Provider value={{ user, login, logout }}>
+        <UserContext.Provider value={{ user, login, logout, loading }}>
             {children}
         </UserContext.Provider>
     )
