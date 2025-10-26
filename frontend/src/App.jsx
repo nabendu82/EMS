@@ -7,6 +7,9 @@ import AuthContext from './context/authContext.jsx'
 import PrivateRoutes from './utils/PrivateRoutes.jsx'
 import RoleRoutes from './utils/RoleRoutes.jsx'
 import RootRedirect from './components/RootRedirect.jsx'
+import AdminSummary from './components/AdminSummary.jsx'
+import DepartmentList from './components/DepartmentList.jsx'
+import AddDepartment from './components/AddDepartment.jsx'
 
 function App() {
   return (
@@ -22,7 +25,11 @@ function App() {
                   <AdminDashboard />
                 </RoleRoutes>
               </PrivateRoutes>
-            } />
+            }>
+              <Route index element={<AdminSummary />} />
+              <Route path="/admin-dashboard/departments" element={<DepartmentList />} />
+              <Route path="/admin-dashboard/add-department" element={<AddDepartment />} />
+            </Route>
             <Route path="/employee-dashboard" element={
               <PrivateRoutes>
                 <RoleRoutes roles={["employee"]}>
