@@ -1,7 +1,36 @@
 import { Link } from 'react-router-dom'
 import { FaPlus } from 'react-icons/fa'
+import DataTable from 'react-data-table-component'
+import { columns } from '../utils/DepartmentHelper'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
+import { DepartmentButtons } from '../utils/DepartmentHelper'
 
 const DepartmentList = () => {
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await axios.get('http://localhost:3000/api/department', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+            if(response.data.success) {
+                let sno = 1;
+                const departments = response.data.departments.map(department => ({
+                    _id: department._id,
+                    sno: sno++,
+                    name: department.name,
+                    description: department.description || "No description available",
+                    action: <DepartmentButtons />
+                }))
+                setData(departments)
+            }
+        }
+        fetchData()
+    }, [])
+
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -22,6 +51,35 @@ const DepartmentList = () => {
                     <FaPlus className="text-lg" />
                     <span>Add Department</span>
                 </Link>
+            </div>
+            <div className="mt-6 overflow-x-auto">
+                <DataTable columns={columns} data={data}
+                    customStyles={{
+                        table: {
+                            style: { borderRadius: '12px', overflow: 'hidden' },
+                        },
+                        headRow: {
+                            style: {
+                                backgroundColor: '#10b981', color: '#ffffff', fontSize: '16px', fontWeight: 'bold', borderBottom: 'none'
+                            },
+                        },
+                        headCells: {
+                            style: { paddingLeft: '20px', paddingRight: '20px' },
+                        },
+                        cells: {
+                            style: { paddingLeft: '20px', paddingRight: '20px', fontSize: '15px' },
+                        },
+                        rows: {
+                            style: {
+                                '&:nth-of-type(odd)': { backgroundColor: '#f9fafb' },
+                                '&:hover': { backgroundColor: '#f3f4f6', cursor: 'pointer' },
+                            },
+                        },
+                    }}
+                    pagination
+                    paginationPerPage={10}
+                    paginationRowsPerPageOptions={[10, 20, 30]}
+                />
             </div>
         </div>
     )
