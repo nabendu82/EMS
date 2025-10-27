@@ -8,6 +8,8 @@ import { DepartmentButtons } from '../utils/DepartmentHelper'
 
 const DepartmentList = () => {
     const [data, setData] = useState([])
+    const [filteredData, setFilteredData] = useState([])
+    const [searchQuery, setSearchQuery] = useState("")
 
     useEffect(() => {
         const fetchData = async () => {
@@ -26,10 +28,23 @@ const DepartmentList = () => {
                     action: <DepartmentButtons _id={department._id} />
                 }))
                 setData(departments)
+                setFilteredData(departments)
             }
         }
         fetchData()
     }, [])
+
+    useEffect(() => {
+        if (searchQuery === "") {
+            setFilteredData(data)
+        } else {
+            const filtered = data.filter(department =>
+                department.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                department.description.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            setFilteredData(filtered)
+        }
+    }, [searchQuery, data])
 
     return (
         <div className="p-6">
@@ -41,6 +56,8 @@ const DepartmentList = () => {
                     <input 
                         type="text" 
                         placeholder="Search Department..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200"
                     />
                 </div>
@@ -53,7 +70,7 @@ const DepartmentList = () => {
                 </Link>
             </div>
             <div className="mt-6 overflow-x-auto">
-                <DataTable columns={columns} data={data}
+                <DataTable columns={columns} data={filteredData}
                     customStyles={{
                         table: {
                             style: { borderRadius: '12px', overflow: 'hidden' },
