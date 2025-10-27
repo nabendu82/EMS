@@ -23,7 +23,7 @@ const DepartmentList = () => {
                     sno: sno++,
                     name: department.name,
                     description: department.description || "No description available",
-                    action: <DepartmentButtons />
+                    action: <DepartmentButtons _id={department._id} />
                 }))
                 setData(departments)
             }

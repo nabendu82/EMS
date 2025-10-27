@@ -10,6 +10,7 @@ import RootRedirect from './components/RootRedirect.jsx'
 import AdminSummary from './components/AdminSummary.jsx'
 import DepartmentList from './components/DepartmentList.jsx'
 import AddDepartment from './components/AddDepartment.jsx'
+import EditDepartment from './components/EditDepartment.jsx'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
               <Route index element={<AdminSummary />} />
               <Route path="/admin-dashboard/departments" element={<DepartmentList />} />
               <Route path="/admin-dashboard/add-department" element={<AddDepartment />} />
+              <Route path="/admin-dashboard/department/:id" element={<EditDepartment />} />
             </Route>
             <Route path="/employee-dashboard" element={
               <PrivateRoutes>

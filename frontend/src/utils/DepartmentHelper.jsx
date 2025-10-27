@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom"
+
 export const columns = [
     {
         name: "S No",
@@ -29,10 +31,11 @@ export const columns = [
     }
 ]
 
-export const DepartmentButtons = () => {
+export const DepartmentButtons = ({ _id }) => {
+    const navigate = useNavigate()
     return (
         <div className="flex items-center gap-2">
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200" onClick={() => navigate(`/admin-dashboard/department/${_id}`)}>
                 Edit
             </button>
             <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200">
