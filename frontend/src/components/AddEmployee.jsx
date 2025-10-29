@@ -24,9 +24,26 @@ const AddEmployee = () => {
     const handleSubmit = async e => {
         e.preventDefault()
         try {
-            const response = await axios.post("http://localhost:3000/api/employee/add", employee, {
+            const formData = new FormData()
+            formData.append('name', employee.name)
+            formData.append('email', employee.email)
+            formData.append('employeeId', employee.employeeId)
+            formData.append('dateOfBirth', employee.dateOfBirth)
+            formData.append('gender', employee.gender)
+            formData.append('maritalStatus', employee.maritalStatus)
+            formData.append('designation', employee.designation)
+            formData.append('department', employee.department)
+            formData.append('salary', employee.salary)
+            formData.append('password', employee.password)
+            formData.append('role', employee.role)
+            if (employee.image) {
+                formData.append('image', employee.image)
+            }
+            
+            const response = await axios.post("http://localhost:3000/api/employee/add", formData, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    'Content-Type': 'multipart/form-data'
                 }
             })
             console.log(response)
@@ -35,6 +52,11 @@ const AddEmployee = () => {
             }
         } catch (error) {
             console.log(error)
+            if(error.response && error.response.data) {
+                alert(error.response.data.message || error.response.data.error || "Failed to add employee")
+            } else {
+                alert("Failed to add employee")
+            }
         }
     }
     return (
