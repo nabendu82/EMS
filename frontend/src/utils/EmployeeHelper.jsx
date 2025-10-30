@@ -58,8 +58,7 @@ export const EmployeeButtons = ({ _id }) => {
     const navigate = useNavigate()
     
     const handleView = () => {
-        // Functionality to be added later
-        console.log("View employee:", _id)
+        navigate(`/admin-dashboard/employees/${_id}`)
     }
     
     const handleEdit = () => {
