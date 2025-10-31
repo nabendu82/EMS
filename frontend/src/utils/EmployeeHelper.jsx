@@ -65,11 +65,6 @@ export const EmployeeButtons = ({ _id }) => {
         navigate(`/admin-dashboard/employees/edit/${_id}`)
     }
     
-    const handleSalary = () => {
-        // Functionality to be added later
-        console.log("Salary employee:", _id)
-    }
-    
     const handleLeave = () => {
         // Functionality to be added later
         console.log("Leave employee:", _id)
@@ -82,9 +77,6 @@ export const EmployeeButtons = ({ _id }) => {
             </button>
             <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-sm" onClick={handleEdit}>
                 Edit
-            </button>
-            <button className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-sm" onClick={handleSalary}>
-                Salary
             </button>
             <button className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-sm" onClick={handleLeave}>
                 Leave
