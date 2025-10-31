@@ -6,6 +6,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -82,4 +83,27 @@ const getEmployeeById = async (req, res) => {
     }
 }
 
-export { addEmployee, upload, getEmployees, getEmployeeById }
+const editEmployee = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, maritalStatus, designation, department, salary } = req.body
+
+        const employee = await Employee.findById({_id: id })
+        if (!employee) return res.status(400).json({ success: false, message: "Employee not found" })
+            
+        const user = await User.findById({_id: employee.userId })
+        if (!user) return res.status(400).json({ success: false, message: "User not found" })
+
+        const updateUser = await User.findByIdAndUpdate({_id: user._id }, { name }, { new: true })
+        if (!updateUser) return res.status(400).json({ success: false, message: "User not updated" })
+
+        const updateEmployee = await Employee.findByIdAndUpdate({_id: employee._id }, { maritalStatus, designation, department, salary }, { new: true })
+        if (!updateEmployee) return res.status(400).json({ success: false, message: "Employee not updated" })
+
+        return res.status(200).json({ success: true, message: "Employee updated successfully", employee: updateEmployee, user: updateUser })
+    } catch (error) {
+        return res.status(500).json({ success: false, error: "Server error in editing employee" })
+    }
+}
+
+export { addEmployee, upload, getEmployees, getEmployeeById, editEmployee }

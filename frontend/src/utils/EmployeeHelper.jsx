@@ -62,8 +62,7 @@ export const EmployeeButtons = ({ _id }) => {
     }
     
     const handleEdit = () => {
-        // Functionality to be added later
-        console.log("Edit employee:", _id)
+        navigate(`/admin-dashboard/employees/edit/${_id}`)
     }
     
     const handleSalary = () => {
