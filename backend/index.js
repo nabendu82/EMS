@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js'
 import departmentRoutes from './routes/department.js'
 import employeeRoutes from './routes/employee.js'
 import connectDB from './db/db.js'
+import leaveRoutes from './routes/leave.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -19,6 +20,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')))
 app.use('/api/auth', authRoutes)
 app.use('/api/department', departmentRoutes)
 app.use('/api/employee', employeeRoutes)
+app.use('/api/leave', leaveRoutes)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`)
