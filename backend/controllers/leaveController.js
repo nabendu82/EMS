@@ -11,4 +11,13 @@ const addLeave = async (req, res) => {
     }
 }
 
-export { addLeave }
+const getLeaves = async (req, res) => {
+    try {
+        const leaves = await Leave.find({ userId: req.user._id }).sort({ createdAt: -1 })
+        return res.status(200).json({ success: true, leaves })
+    } catch (error) {
+        return res.status(500).json({ success: false, error: "Fetch leaves failed" })
+    }
+}
+
+export { addLeave, getLeaves }
