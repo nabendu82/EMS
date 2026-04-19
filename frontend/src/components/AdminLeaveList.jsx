@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
 
@@ -92,16 +93,19 @@ const AdminLeaveList = () => {
             { name: 'Status', selector: (row) => row.statusDisplay, sortable: true, width: '120px' },
             {
                 name: 'Action',
-                cell: () => (
-                    <button type="button"
-                        className="rounded-md bg-teal-600 px-3 py-1.5 text-sm font-semibold text-white shadow hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">View
-                    </button>
+                cell: (row) => (
+                    <Link
+                        to={`/admin-dashboard/leaves/${row._id}`}
+                        className="inline-block rounded-md bg-teal-600 px-3 py-1.5 text-center text-sm font-semibold text-white shadow hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                        View
+                    </Link>
                 ),
                 ignoreRowClick: true,
                 allowOverflow: true,
                 width: '110px',
             },
-        ],[])
+        ], [])
 
     const filterBtn = (key, label, colorClass) => (
         <button

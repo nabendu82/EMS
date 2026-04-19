@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import Leave from '../models/Leave.js'
 import Employee from '../models/Employee.js'
 
@@ -59,4 +60,55 @@ const getAllLeaves = async (req, res) => {
     }
 }
 
-export { addLeave, getLeaves, getAllLeaves }
+const leaveTypeDisplay = (type) => {
+    const map = { casual: 'Casual Leave', sick: 'Sick Leave', annual: 'Annual Leave' }
+    return map[type] ?? type ?? 'N/A'
+}
+
+const statusDisplay = (status) => {
+    const s = (status ?? 'pending').toLowerCase()
+    if (s === 'approved') return 'Approved'
+    if (s === 'rejected') return 'Rejected'
+    return 'Pending'
+}
+
+const getLeaveById = async (req, res) => {
+    try {
+        const { id } = req.params
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, error: 'Invalid leave id' })
+        }
+        const leave = await Leave.findById(id).populate('userId', 'name profileImage')
+        if (!leave) {
+            return res.status(404).json({ success: false, error: 'Leave not found' })
+        }
+        const ownerId = leave.userId?._id ?? leave.userId
+        if (req.user.role === 'employee' && String(ownerId) !== String(req.user._id)) {
+            return res.status(403).json({ success: false, error: 'Forbidden' })
+        }
+
+        const employee = await Employee.findOne({ userId: ownerId }).populate('department', 'name')
+
+        return res.status(200).json({
+            success: true,
+            leave: {
+                _id: leave._id,
+                name: leave.userId?.name ?? 'N/A',
+                profileImage: leave.userId?.profileImage ?? null,
+                employeeId: employee?.employeeId ?? 'N/A',
+                department: employee?.department?.name ?? 'N/A',
+                leaveType: leave.leaveType,
+                leaveTypeDisplay: leaveTypeDisplay(leave.leaveType),
+                reason: leave.reason ?? '-',
+                startDate: leave.startDate,
+                endDate: leave.endDate,
+                status: leave.status,
+                statusDisplay: statusDisplay(leave.status),
+            },
+        })
+    } catch (error) {
+        return res.status(500).json({ success: false, error: 'Fetch leave failed' })
+    }
+}
+
+export { addLeave, getLeaves, getAllLeaves, getLeaveById }

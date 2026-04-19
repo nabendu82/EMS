@@ -1,16 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
-
-const columns = [
-    { name: 'S No', selector: (row) => row.sno, sortable: true, width: '100px' },
-    { name: 'Type', selector: (row) => row.leaveType, sortable: true, width: '120px' },
-    { name: 'Start Date', selector: (row) => row.startDate, sortable: true, width: '140px' },
-    { name: 'End Date', selector: (row) => row.endDate, sortable: true, width: '140px' },
-    { name: 'Status', selector: (row) => row.status, sortable: true, width: '120px' },
-    { name: 'Reason', selector: (row) => row.reason, sortable: false, wrap: true },
-]
 
 const LeaveList = () => {
     const [data, setData] = useState([])
@@ -62,6 +53,29 @@ const LeaveList = () => {
             setFilteredData(filtered)
         }
     }, [searchQuery, data])
+
+    const columns = useMemo(() => [
+            { name: 'S No', selector: (row) => row.sno, sortable: true, width: '100px' },
+            { name: 'Type', selector: (row) => row.leaveType, sortable: true, width: '120px' },
+            { name: 'Start Date', selector: (row) => row.startDate, sortable: true, width: '140px' },
+            { name: 'End Date', selector: (row) => row.endDate, sortable: true, width: '140px' },
+            { name: 'Status', selector: (row) => row.status, sortable: true, width: '120px' },
+            { name: 'Reason', selector: (row) => row.reason, sortable: false, wrap: true },
+            {
+                name: 'Action',
+                cell: (row) => (
+                    <Link
+                        to={`/employee-dashboard/leaves/${row._id}`}
+                        className="inline-block rounded-md bg-teal-600 px-3 py-1.5 text-center text-sm font-semibold text-white shadow hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                        View
+                    </Link>
+                ),
+                ignoreRowClick: true,
+                allowOverflow: true,
+                width: '110px',
+            },
+        ],[])
 
     return (
         <div className="p-6">
