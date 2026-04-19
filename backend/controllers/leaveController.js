@@ -111,4 +111,37 @@ const getLeaveById = async (req, res) => {
     }
 }
 
-export { addLeave, getLeaves, getAllLeaves, getLeaveById }
+const updateLeaveStatus = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, error: 'Forbidden' })
+        }
+        const { id } = req.params
+        const { status } = req.body
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, error: 'Invalid leave id' })
+        }
+        if (status !== 'approved' && status !== 'rejected') {
+            return res.status(400).json({ success: false, error: 'Status must be approved or rejected' })
+        }
+        const leave = await Leave.findById(id)
+        if (!leave) {
+            return res.status(404).json({ success: false, error: 'Leave not found' })
+        }
+        if (leave.status !== 'pending') {
+            return res.status(400).json({ success: false, error: 'Only pending leaves can be updated' })
+        }
+        leave.status = status
+        leave.updatedAt = new Date()
+        await leave.save()
+        return res.status(200).json({
+            success: true,
+            status: leave.status,
+            statusDisplay: statusDisplay(leave.status),
+        })
+    } catch (error) {
+        return res.status(500).json({ success: false, error: 'Update leave status failed' })
+    }
+}
+
+export { addLeave, getLeaves, getAllLeaves, getLeaveById, updateLeaveStatus }
