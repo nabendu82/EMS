@@ -21,6 +21,7 @@ import LeaveList from './components/LeaveList.jsx'
 import AddLeave from './components/AddLeave.jsx'
 import ViewSalary from './components/ViewSalary.jsx'
 import Settings from './components/Settings.jsx'
+import AdminLeaveList from './components/AdminLeaveList.jsx'
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
               <Route path="/admin-dashboard/employees/:id" element={<ViewEmployee />} />
               <Route path="/admin-dashboard/employees/edit/:id" element={<EditEmployee />} />
               <Route path="/admin-dashboard/salaries" element={<SalaryList />} />
+              <Route path="/admin-dashboard/leaves" element={<AdminLeaveList />} />
             </Route>
             <Route path="/employee-dashboard" element={
               <PrivateRoutes>
