@@ -60,6 +60,40 @@ const getAllLeaves = async (req, res) => {
     }
 }
 
+const getLeavesForEmployee = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, error: 'Forbidden' })
+        }
+        const { id } = req.params
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, error: 'Invalid employee id' })
+        }
+        const employee = await Employee.findById(id)
+            .populate('userId', 'name')
+            .populate('department', 'name')
+
+        if (!employee) return res.status(404).json({ success: false, error: 'Employee not found' })
+        
+        const leaves = await Leave.find({ userId: employee.userId?._id ?? employee.userId }).sort({ createdAt: -1 })
+        const enriched = leaves.map((leave) => ({
+            _id: leave._id,
+            employeeId: employee.employeeId ?? 'N/A',
+            employeeName: employee.userId?.name ?? 'N/A',
+            department: employee.department?.name ?? 'N/A',
+            leaveType: leave.leaveType,
+            startDate: leave.startDate,
+            endDate: leave.endDate,
+            reason: leave.reason,
+            status: leave.status,
+            createdAt: leave.createdAt,
+        }))
+        return res.status(200).json({ success: true, leaves: enriched })
+    } catch (error) {
+        return res.status(500).json({ success: false, error: 'Fetch employee leaves failed' })
+    }
+}
+
 const leaveTypeDisplay = (type) => {
     const map = { casual: 'Casual Leave', sick: 'Sick Leave', annual: 'Annual Leave' }
     return map[type] ?? type ?? 'N/A'
@@ -144,4 +178,4 @@ const updateLeaveStatus = async (req, res) => {
     }
 }
 
-export { addLeave, getLeaves, getAllLeaves, getLeaveById, updateLeaveStatus }
+export { addLeave, getLeaves, getAllLeaves, getLeavesForEmployee, getLeaveById, updateLeaveStatus }

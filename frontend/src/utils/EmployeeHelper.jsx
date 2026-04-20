@@ -66,8 +66,7 @@ export const EmployeeButtons = ({ _id }) => {
     }
     
     const handleLeave = () => {
-        // Functionality to be added later
-        console.log("Leave employee:", _id)
+        navigate(`/admin-dashboard/employees/leaves/${_id}`)
     }
     
     return (
