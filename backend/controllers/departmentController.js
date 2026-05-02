@@ -1,4 +1,8 @@
 import Department from '../models/Department.js'
+import Employee from '../models/Employee.js'
+import User from '../models/User.js'
+import Leave from '../models/Leave.js'
+import Salary from '../models/Salary.js'
 
 const addDepartment = async (req, res) => {
     try {
@@ -44,12 +48,38 @@ const editDepartment = async (req, res) => {
 const deleteDepartment = async (req, res) => {
     try {
         const { id } = req.params
-        const department = await Department.findByIdAndDelete(id)
+        const department = await Department.findById(id)
         if (!department) {
             return res.status(404).json({ success: false, error: "Department not found" })
         }
-        return res.status(200).json({ success: true, message: "Department deleted successfully" })
+
+        // Find all employees in this department
+        const employees = await Employee.find({ department: id })
+        const userIds = employees.map((emp) => emp.userId).filter(Boolean)
+
+        // Delete all leaves associated with these users
+        if (userIds.length > 0) {
+            await Leave.deleteMany({ userId: { $in: userIds } })
+
+            // Delete all salaries associated with these users
+            await Salary.deleteMany({ userId: { $in: userIds } })
+
+            // Delete the users themselves
+            await User.deleteMany({ _id: { $in: userIds } })
+        }
+
+        // Delete all employees in this department
+        await Employee.deleteMany({ department: id })
+
+        // Finally delete the department
+        await Department.findByIdAndDelete(id)
+
+        return res.status(200).json({
+            success: true,
+            message: `Department deleted successfully along with ${employees.length} employee(s) and their associated records`
+        })
     } catch (error) {
+        console.error("Delete Department Failed:", error)
         return res.status(500).json({ success: false, error: "Delete Department Failed" })
     }
 }

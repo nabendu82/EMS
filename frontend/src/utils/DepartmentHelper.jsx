@@ -36,7 +36,7 @@ export const DepartmentButtons = ({ _id }) => {
     const navigate = useNavigate()
     
     const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete this department?")) {
+        if (window.confirm("Are you sure you want to delete this department?\n\nWARNING: This will also permanently delete all employees in this department, their associated user accounts, leaves, and salary records. This action cannot be undone!")) {
             try {
                 const response = await axios.delete(`http://localhost:3000/api/department/${_id}`, {
                     headers: {
@@ -44,7 +44,7 @@ export const DepartmentButtons = ({ _id }) => {
                     }
                 })
                 if (response.data.success) {
-                    alert("Department deleted successfully!")
+                    alert(response.data.message || "Department deleted successfully!")
                     window.location.reload()
                 }
             } catch (error) {
