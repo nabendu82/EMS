@@ -9,6 +9,7 @@ import connectDB from './db/db.js'
 import leaveRoutes from './routes/leave.js'
 import salaryRoutes from './routes/salary.js'
 import settingsRoutes from './routes/settings.js'
+import dashboardRouter from './routes/dashboard.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -25,6 +26,7 @@ app.use('/api/employee', employeeRoutes)
 app.use('/api/leave', leaveRoutes)
 app.use('/api/salary', salaryRoutes)
 app.use('/api/settings', settingsRoutes)
+app.use('/api/dashboard', dashboardRouter)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`)
