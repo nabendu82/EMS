@@ -9,12 +9,12 @@ const AdminSummary = () => {
     useEffect(() => {
         const fetchSummary = async () => {
             try {
-                const summary = await axios.get('http://localhost:3000/api/dashboard/summary', {
+                const response = await axios.get('http://localhost:3000/api/dashboard/summary', {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 })
-                setSummary(summary);
+                setSummary(response.data);
             } catch (error) {
                 if(error.response) alert(error.response.data.error)
                     console.log(error.message)
@@ -45,10 +45,10 @@ const AdminSummary = () => {
             <div className="mt-12">
                 <h4 className="text-xl font-bold">Leave Details</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
-                    <SummaryCard icon={<FaCalendarAlt />} title="Leave Applied" number={5} color="bg-yellow-500"/>
-                    <SummaryCard icon={<FaCheckCircle />} title="Leave Approved" number={4} color="bg-green-500"/>
-                    <SummaryCard icon={<FaTimesCircle />} title="Leave Rejected" number={1} color="bg-red-500"/>
-                    <SummaryCard icon={<FaChartLine />} title="Leave Pending" number={7} color="bg-blue-500"/>
+                    <SummaryCard icon={<FaCalendarAlt />} title="Leave Applied" number={summary.leaveSummary?.appliedFor || 0} color="bg-yellow-500"/>
+                    <SummaryCard icon={<FaCheckCircle />} title="Leave Approved" number={summary.leaveSummary?.approved || 0} color="bg-green-500"/>
+                    <SummaryCard icon={<FaTimesCircle />} title="Leave Rejected" number={summary.leaveSummary?.rejected || 0} color="bg-red-500"/>
+                    <SummaryCard icon={<FaChartLine />} title="Leave Pending" number={summary.leaveSummary?.pending || 0} color="bg-blue-500"/>
                 </div>
             </div>
         </div>
