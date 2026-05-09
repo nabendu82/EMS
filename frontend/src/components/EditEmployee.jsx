@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { FaUserEdit } from 'react-icons/fa'
+import { FaUserEdit, FaCamera } from 'react-icons/fa'
 import fetchDepartments from '../utils/EmployeeHelper'
 
 const EditEmployee = () => {
@@ -11,6 +11,8 @@ const EditEmployee = () => {
     const [allProjects, setAllProjects] = useState([])
     const [selectedProjectIds, setSelectedProjectIds] = useState([])
     const [loading, setLoading] = useState(true)
+    const [image, setImage] = useState(null)
+    const [imagePreview, setImagePreview] = useState(null)
     const [formState, setFormState] = useState({
         name: '',
         maritalStatus: '',
@@ -41,6 +43,10 @@ const EditEmployee = () => {
                         salary: employee.salary ?? '',
                         department: employee.department?._id ?? ''
                     })
+                    // Set current profile image preview
+                    if (employee.userId?.profileImage) {
+                        setImagePreview(employee.userId.profileImage)
+                    }
                     const assigned = employee.projects ?? []
                     setSelectedProjectIds(assigned.map((p) => String(p._id)))
                 }
@@ -66,6 +72,14 @@ const EditEmployee = () => {
         setFormState((prev) => ({ ...prev, [name]: value }))
     }
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            setImage(file)
+            setImagePreview(URL.createObjectURL(file))
+        }
+    }
+
     const toggleProject = (projectId) => {
         const s = String(projectId)
         setSelectedProjectIds((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
@@ -74,11 +88,25 @@ const EditEmployee = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
+            const formData = new FormData()
+            formData.append('name', formState.name)
+            formData.append('maritalStatus', formState.maritalStatus)
+            formData.append('designation', formState.designation)
+            formData.append('department', formState.department)
+            formData.append('salary', formState.salary)
+            formData.append('projects', JSON.stringify(selectedProjectIds))
+            if (image) {
+                formData.append('image', image)
+            }
+
             const response = await axios.put(
                 `http://localhost:3000/api/employee/${id}`,
-                { ...formState, projects: selectedProjectIds },
+                formData,
                 {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
                 }
             )
             if (response.data.success) {
@@ -86,6 +114,11 @@ const EditEmployee = () => {
             }
         } catch (error) {
             console.error('Error updating employee:', error)
+            if(error.response && error.response.data) {
+                alert(error.response.data.message || error.response.data.error || "Failed to update employee")
+            } else {
+                alert("Failed to update employee")
+            }
         }
     }
 
@@ -115,6 +148,31 @@ const EditEmployee = () => {
 
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
                     <form className="space-y-6" onSubmit={handleSubmit}>
+                        {/* Profile Image Section */}
+                        <div className="flex flex-col items-center mb-6">
+                            <div className="relative">
+                                <img
+                                    src={imagePreview || 'https://via.placeholder.com/120'}
+                                    alt="Profile preview"
+                                    className="w-28 h-28 rounded-full object-cover border-4 border-emerald-100 shadow-md"
+                                />
+                                <label
+                                    htmlFor="imageUpload"
+                                    className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-2.5 rounded-full cursor-pointer shadow-lg hover:bg-emerald-600 transition-colors duration-200"
+                                >
+                                    <FaCamera className="text-sm" />
+                                </label>
+                                <input
+                                    type="file"
+                                    id="imageUpload"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">Click the camera icon to change profile image</p>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label htmlFor="name" className="block text-sm font-semibold text-gray-700">

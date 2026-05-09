@@ -86,10 +86,19 @@ const editEmployee = async (req, res) => {
 
         let projectIds
         if (projects !== undefined) {
-            if (!Array.isArray(projects)) {
+            let parsedProjects = projects
+            // When sent via FormData/multipart, the array is JSON-encoded as a string
+            if (typeof projects === 'string') {
+                try {
+                    parsedProjects = JSON.parse(projects)
+                } catch {
+                    return res.status(400).json({ success: false, message: 'projects must be a valid JSON array' })
+                }
+            }
+            if (!Array.isArray(parsedProjects)) {
                 return res.status(400).json({ success: false, message: 'projects must be an array' })
             }
-            projectIds = [...new Set(projects.map((p) => String(p)).filter((id) => mongoose.Types.ObjectId.isValid(id)))]
+            projectIds = [...new Set(parsedProjects.map((p) => String(p)).filter((id) => mongoose.Types.ObjectId.isValid(id)))]
             if (projectIds.length > 0) {
                 const count = await Project.countDocuments({ _id: { $in: projectIds } })
                 if (count !== projectIds.length) {
@@ -98,7 +107,12 @@ const editEmployee = async (req, res) => {
             }
         }
 
-        const updateUser = await User.findByIdAndUpdate({ _id: user._id }, { name }, { new: true })
+        // Update user - include profileImage if a new image was uploaded
+        const userUpdatePayload = { name }
+        if (req.file) {
+            userUpdatePayload.profileImage = req.file.path
+        }
+        const updateUser = await User.findByIdAndUpdate({ _id: user._id }, userUpdatePayload, { new: true })
         if (!updateUser) return res.status(400).json({ success: false, message: 'User not updated' })
 
         const updatePayload = { maritalStatus, designation, department, salary: Number(salary) }
