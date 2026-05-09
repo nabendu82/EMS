@@ -76,7 +76,7 @@ const LeaveDetails = () => {
 
     const imageSrc =
         detail?.profileImage != null && detail.profileImage !== ''
-            ? `http://localhost:3000/public/uploads/${detail.profileImage}`
+            ? detail.profileImage
             : null
 
     const isPending = detail && (detail.status ?? '').toLowerCase() === 'pending'

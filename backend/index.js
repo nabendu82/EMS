@@ -1,7 +1,5 @@
 import express from 'express'
 import cors from 'cors'
-import path from 'path'
-import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.js'
 import departmentRoutes from './routes/department.js'
 import employeeRoutes from './routes/employee.js'
@@ -13,15 +11,12 @@ import dashboardRouter from './routes/dashboard.js'
 import timesheetRoutes from './routes/timesheet.js'
 import projectRoutes from './routes/project.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
 connectDB()
 const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use('/public', express.static(path.join(__dirname, 'public')))
+// Images are now served from Cloudinary, not local public/uploads
 app.use('/api/auth', authRoutes)
 app.use('/api/department', departmentRoutes)
 app.use('/api/employee', employeeRoutes)

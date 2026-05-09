@@ -30,7 +30,7 @@ const EmployeeList = () => {
                             _id: employee._id,
                             sno: sno++,
                             image: (
-                                <img src={`http://localhost:3000/public/uploads/${user.profileImage}`} alt={user.name}
+                                <img src={user.profileImage} alt={user.name}
                                     className="w-12 h-12 rounded-full object-cover mx-auto"
                                 />
                             ),

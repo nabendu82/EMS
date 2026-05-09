@@ -3,32 +3,7 @@ import Employee from '../models/Employee.js'
 import User from '../models/User.js'
 import Project from '../models/Project.js'
 import bcrypt from 'bcrypt'
-import multer from 'multer'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import fs from 'fs'
-
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-const uploadDir = path.join(__dirname, '../public/uploads')
-
-// Create uploads directory if it doesn't exist
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true })
-}
-
-const storage = multer.diskStorage({    
-    destination: (req, file, cb) => {
-        cb(null, uploadDir)
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + path.extname(file.originalname))
-    }
-})
-
-const upload = multer({ storage })
+import { upload } from '../config/cloudinary.js'
 
 const addEmployee = async (req, res) => {
     try {
@@ -51,8 +26,8 @@ const addEmployee = async (req, res) => {
         // Hash password
         const hashPassword = await bcrypt.hash(password, 10)
         
-        // Create new user
-        const newUser = new User({ name, email, password: hashPassword, role, profileImage: req.file.filename })
+        // Create new user - store the full Cloudinary URL
+        const newUser = new User({ name, email, password: hashPassword, role, profileImage: req.file.path })
         await newUser.save()
         
         // Create new employee
