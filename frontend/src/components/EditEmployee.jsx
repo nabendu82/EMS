@@ -8,6 +8,8 @@ const EditEmployee = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const [departments, setDepartments] = useState([])
+    const [allProjects, setAllProjects] = useState([])
+    const [selectedProjectIds, setSelectedProjectIds] = useState([])
     const [loading, setLoading] = useState(true)
     const [formState, setFormState] = useState({
         name: '',
@@ -20,11 +22,14 @@ const EditEmployee = () => {
     useEffect(() => {
         const initialise = async () => {
             try {
-                const [employeeResponse, departmentList] = await Promise.all([
+                const [employeeResponse, departmentList, projectsResponse] = await Promise.all([
                     axios.get(`http://localhost:3000/api/employee/${id}`, {
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                     }),
-                    fetchDepartments()
+                    fetchDepartments(),
+                    axios.get('http://localhost:3000/api/project', {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    })
                 ])
 
                 if (employeeResponse.data.success) {
@@ -36,10 +41,15 @@ const EditEmployee = () => {
                         salary: employee.salary ?? '',
                         department: employee.department?._id ?? ''
                     })
+                    const assigned = employee.projects ?? []
+                    setSelectedProjectIds(assigned.map((p) => String(p._id)))
                 }
 
                 if (Array.isArray(departmentList)) {
                     setDepartments(departmentList)
+                }
+                if (projectsResponse.data?.success && Array.isArray(projectsResponse.data.projects)) {
+                    setAllProjects(projectsResponse.data.projects)
                 }
             } catch (error) {
                 console.error('Error initialising edit employee form:', error)
@@ -56,12 +66,21 @@ const EditEmployee = () => {
         setFormState((prev) => ({ ...prev, [name]: value }))
     }
 
+    const toggleProject = (projectId) => {
+        const s = String(projectId)
+        setSelectedProjectIds((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.put(`http://localhost:3000/api/employee/${id}`, formState, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            })
+            const response = await axios.put(
+                `http://localhost:3000/api/employee/${id}`,
+                { ...formState, projects: selectedProjectIds },
+                {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                }
+            )
             if (response.data.success) {
                 navigate('/admin-dashboard/employees')
             }
@@ -184,6 +203,37 @@ const EditEmployee = () => {
                                     ))}
                                 </select>
                                 <p className="text-sm text-gray-500">Choose the team this employee belongs to.</p>
+                            </div>
+
+                            <div className="space-y-2 md:col-span-2">
+                                <label className="block text-sm font-semibold text-gray-700">Assigned projects</label>
+                                <p className="text-sm text-gray-500">
+                                    Select one or more projects this employee can log time against (timesheet uses a dropdown per
+                                    row).
+                                </p>
+                                <div className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4">
+                                    {allProjects.length === 0 ? (
+                                        <p className="text-sm text-gray-600">
+                                            No projects yet. Add some under <span className="font-semibold">Projects</span> in the
+                                            sidebar.
+                                        </p>
+                                    ) : (
+                                        allProjects.map((p) => (
+                                            <label
+                                                key={p._id}
+                                                className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-white"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedProjectIds.includes(String(p._id))}
+                                                    onChange={() => toggleProject(p._id)}
+                                                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                                />
+                                                <span className="text-sm font-medium text-gray-800">{p.name}</span>
+                                            </label>
+                                        ))
+                                    )}
+                                </div>
                             </div>
                         </div>
 

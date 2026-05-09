@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { FaHome, FaUsers, FaBuilding, FaCalendarAlt, FaMoneyBill, FaChartLine } from 'react-icons/fa'
+import { FaHome, FaUsers, FaBuilding, FaCalendarAlt, FaMoneyBill, FaChartLine, FaClipboardList, FaFolderOpen } from 'react-icons/fa'
 
 const AdminSidebar = () => {
     return (
@@ -40,6 +40,15 @@ const AdminSidebar = () => {
                     <span className="font-medium">Departments</span>
                 </NavLink>
                 <NavLink 
+                    to="/admin-dashboard/projects" 
+                    className={({ isActive }) => 
+                        `flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                            isActive ? 'bg-green-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                >
+                    <FaFolderOpen className="text-lg" />
+                    <span className="font-medium">Projects</span>
+                </NavLink>
+                <NavLink 
                     to="/admin-dashboard/leaves" 
                     className={({ isActive }) => 
                         `flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
@@ -47,6 +56,15 @@ const AdminSidebar = () => {
                 >
                     <FaCalendarAlt className="text-lg" />
                     <span className="font-medium">Leaves</span>
+                </NavLink>
+                <NavLink 
+                    to="/admin-dashboard/timesheets" 
+                    className={({ isActive }) => 
+                        `flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                            isActive ? 'bg-green-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                >
+                    <FaClipboardList className="text-lg" />
+                    <span className="font-medium">Timesheets</span>
                 </NavLink>
                 <NavLink 
                     to="/admin-dashboard/salaries" 

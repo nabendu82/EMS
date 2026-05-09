@@ -10,6 +10,8 @@ import leaveRoutes from './routes/leave.js'
 import salaryRoutes from './routes/salary.js'
 import settingsRoutes from './routes/settings.js'
 import dashboardRouter from './routes/dashboard.js'
+import timesheetRoutes from './routes/timesheet.js'
+import projectRoutes from './routes/project.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -27,6 +29,8 @@ app.use('/api/leave', leaveRoutes)
 app.use('/api/salary', salaryRoutes)
 app.use('/api/settings', settingsRoutes)
 app.use('/api/dashboard', dashboardRouter)
+app.use('/api/timesheet', timesheetRoutes)
+app.use('/api/project', projectRoutes)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`)

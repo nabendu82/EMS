@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useParams, useNavigate } from 'react-router-dom'
-import { FaUser, FaArrowLeft, FaEnvelope, FaIdCard, FaCalendar, FaVenusMars, FaHeart, FaBuilding, FaBriefcase, FaDollarSign, FaUserShield } from 'react-icons/fa'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { FaUser, FaArrowLeft, FaEnvelope, FaIdCard, FaCalendar, FaVenusMars, FaHeart, FaBuilding, FaBriefcase, FaDollarSign, FaUserShield, FaFolderOpen } from 'react-icons/fa'
 
 const ViewEmployee = () => {
     const { id } = useParams()
     const navigate = useNavigate()
+    const location = useLocation()
+    const isEmployeePortal = location.pathname.startsWith('/employee-dashboard')
     const [employee, setEmployee] = useState(null)
     const [loading, setLoading] = useState(true)
 
@@ -47,10 +49,10 @@ const ViewEmployee = () => {
                     <div className="text-6xl mb-4">😕</div>
                     <div className="text-2xl font-bold text-gray-800 mb-2">Employee Not Found</div>
                     <button 
-                        onClick={() => navigate('/admin-dashboard/employees')}
+                        onClick={() => navigate(isEmployeePortal ? '/employee-dashboard' : '/admin-dashboard/employees')}
                         className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
                     >
-                        Go Back to Employee List
+                        {isEmployeePortal ? 'Back to Dashboard' : 'Back to Employee List'}
                     </button>
                 </div>
             </div>
@@ -66,11 +68,11 @@ const ViewEmployee = () => {
             <div className="max-w-4xl mx-auto">
                 {/* Back Button */}
                 <button 
-                    onClick={() => navigate('/admin-dashboard/employees')}
+                    onClick={() => navigate(isEmployeePortal ? '/employee-dashboard' : '/admin-dashboard/employees')}
                     className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 font-semibold transition-colors duration-200"
                 >
                     <FaArrowLeft />
-                    <span>Back to Employees</span>
+                    <span>{isEmployeePortal ? 'Back to Dashboard' : 'Back to Employees'}</span>
                 </button>
 
                 {/* Employee Card */}
@@ -205,6 +207,27 @@ const ViewEmployee = () => {
                                             <div className="text-lg font-bold text-gray-800 capitalize">{user.role}</div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div className="mt-6 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+                                    <div className="mb-3 flex items-center gap-2">
+                                        <FaFolderOpen className="text-emerald-600" />
+                                        <h3 className="text-lg font-bold text-gray-800">Assigned projects</h3>
+                                    </div>
+                                    {(employee.projects && employee.projects.length > 0) ? (
+                                        <ul className="flex flex-wrap gap-2">
+                                            {employee.projects.map((p) => (
+                                                <li
+                                                    key={p._id}
+                                                    className="rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-200"
+                                                >
+                                                    {p.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-sm text-gray-600">No projects assigned yet. Contact HR if you need project access for your timesheet.</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

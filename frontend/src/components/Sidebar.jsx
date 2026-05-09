@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { FaHome, FaUsers, FaCalendarAlt, FaMoneyBill, FaChartLine } from 'react-icons/fa'
+import { FaHome, FaUsers, FaCalendarAlt, FaMoneyBill, FaChartLine, FaClock } from 'react-icons/fa'
 import { useAuth } from '../context/authContext'
 
 const Sidebar = () => {
@@ -39,6 +39,15 @@ const Sidebar = () => {
                 >
                     <FaCalendarAlt className="text-lg" />
                     <span className="font-medium">Leaves</span>
+                </NavLink>
+                <NavLink 
+                    to="/employee-dashboard/timesheet" 
+                    className={({ isActive }) => 
+                        `flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                            isActive ? 'bg-green-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                >
+                    <FaClock className="text-lg" />
+                    <span className="font-medium">Timesheet</span>
                 </NavLink>
                 <NavLink 
                     to={`/employee-dashboard/salaries/${user._id}`} 

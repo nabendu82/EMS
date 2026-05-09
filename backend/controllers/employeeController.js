@@ -1,5 +1,7 @@
+import mongoose from 'mongoose'
 import Employee from '../models/Employee.js'
 import User from '../models/User.js'
+import Project from '../models/Project.js'
 import bcrypt from 'bcrypt'
 import multer from 'multer'
 import path from 'path'
@@ -66,7 +68,10 @@ const addEmployee = async (req, res) => {
 
 const getEmployees = async (req, res) => {
     try {
-        const employees = await Employee.find().populate('userId', { password: 0 }).populate('department')
+        const employees = await Employee.find()
+            .populate('userId', { password: 0 })
+            .populate('department')
+            .populate('projects')
         return res.status(200).json({ success: true, employees })
     } catch (error) {
         return res.status(500).json({ success: false, error: "Server error in getting employees" })
@@ -77,9 +82,15 @@ const getEmployeeById = async (req, res) => {
     try {
         const { id } = req.params
         let employee
-        employee = await Employee.findById(id).populate('userId', { password: 0 }).populate('department')
-        if(!employee) {
-            employee = await Employee.findOne({ userId: id }).populate('userId', { password: 0 }).populate('department')
+        employee = await Employee.findById(id)
+            .populate('userId', { password: 0 })
+            .populate('department')
+            .populate('projects')
+        if (!employee) {
+            employee = await Employee.findOne({ userId: id })
+                .populate('userId', { password: 0 })
+                .populate('department')
+                .populate('projects')
         }
         return res.status(200).json({ success: true, employee })
     } catch (error) {
@@ -90,21 +101,44 @@ const getEmployeeById = async (req, res) => {
 const editEmployee = async (req, res) => {
     try {
         const { id } = req.params
-        const { name, maritalStatus, designation, department, salary } = req.body
+        const { name, maritalStatus, designation, department, salary, projects } = req.body
 
-        const employee = await Employee.findById({_id: id })
-        if (!employee) return res.status(400).json({ success: false, message: "Employee not found" })
-            
-        const user = await User.findById({_id: employee.userId })
-        if (!user) return res.status(400).json({ success: false, message: "User not found" })
+        const employee = await Employee.findById({ _id: id })
+        if (!employee) return res.status(400).json({ success: false, message: 'Employee not found' })
 
-        const updateUser = await User.findByIdAndUpdate({_id: user._id }, { name }, { new: true })
-        if (!updateUser) return res.status(400).json({ success: false, message: "User not updated" })
+        const user = await User.findById({ _id: employee.userId })
+        if (!user) return res.status(400).json({ success: false, message: 'User not found' })
 
-        const updateEmployee = await Employee.findByIdAndUpdate({_id: employee._id }, { maritalStatus, designation, department, salary }, { new: true })
-        if (!updateEmployee) return res.status(400).json({ success: false, message: "Employee not updated" })
+        let projectIds
+        if (projects !== undefined) {
+            if (!Array.isArray(projects)) {
+                return res.status(400).json({ success: false, message: 'projects must be an array' })
+            }
+            projectIds = [...new Set(projects.map((p) => String(p)).filter((id) => mongoose.Types.ObjectId.isValid(id)))]
+            if (projectIds.length > 0) {
+                const count = await Project.countDocuments({ _id: { $in: projectIds } })
+                if (count !== projectIds.length) {
+                    return res.status(400).json({ success: false, message: 'One or more invalid project ids' })
+                }
+            }
+        }
 
-        return res.status(200).json({ success: true, message: "Employee updated successfully", employee: updateEmployee, user: updateUser })
+        const updateUser = await User.findByIdAndUpdate({ _id: user._id }, { name }, { new: true })
+        if (!updateUser) return res.status(400).json({ success: false, message: 'User not updated' })
+
+        const updatePayload = { maritalStatus, designation, department, salary: Number(salary) }
+        if (projectIds !== undefined) updatePayload.projects = projectIds
+
+        const updateEmployee = await Employee.findByIdAndUpdate({ _id: employee._id }, updatePayload, { new: true })
+            .populate('projects')
+        if (!updateEmployee) return res.status(400).json({ success: false, message: 'Employee not updated' })
+
+        return res.status(200).json({
+            success: true,
+            message: 'Employee updated successfully',
+            employee: updateEmployee,
+            user: updateUser,
+        })
     } catch (error) {
         return res.status(500).json({ success: false, error: "Server error in editing employee" })
     }

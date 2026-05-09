@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import SummaryCard from './SummaryCard'
-import { FaUsers, FaBuilding, FaCalendarAlt, FaMoneyBill, FaChartLine, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+import { FaUsers, FaBuilding, FaCalendarAlt, FaMoneyBill, FaChartLine, FaCheckCircle, FaTimesCircle, FaClipboardList } from 'react-icons/fa'
 import axios from 'axios';
 
 const AdminSummary = () => {
@@ -50,6 +50,39 @@ const AdminSummary = () => {
                     <SummaryCard icon={<FaTimesCircle />} title="Leave Rejected" number={summary.leaveSummary?.rejected || 0} color="bg-red-500"/>
                     <SummaryCard icon={<FaChartLine />} title="Leave Pending" number={summary.leaveSummary?.pending || 0} color="bg-blue-500"/>
                 </div>
+            </div>
+            <div className="mt-12">
+                <h4 className="text-xl font-bold">Timesheet (this month)</h4>
+                {summary.timesheetSummary ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+                        <SummaryCard
+                            icon={<FaUsers />}
+                            title="Employees w/ submissions"
+                            number={summary.timesheetSummary.employeesWithSubmissions}
+                            color="bg-indigo-500"
+                        />
+                        <SummaryCard
+                            icon={<FaClipboardList />}
+                            title="Weeks awaiting approval"
+                            number={summary.timesheetSummary.weeksPendingApproval}
+                            color="bg-amber-500"
+                        />
+                        <SummaryCard
+                            icon={<FaCheckCircle />}
+                            title="Weeks approved"
+                            number={summary.timesheetSummary.weeksApproved}
+                            color="bg-emerald-600"
+                        />
+                        <SummaryCard
+                            icon={<FaChartLine />}
+                            title="Employees (pending week)"
+                            number={summary.timesheetSummary.employeesWithPendingWeeks}
+                            color="bg-cyan-600"
+                        />
+                    </div>
+                ) : (
+                    <p className="mt-2 text-sm text-gray-500">No timesheet summary available.</p>
+                )}
             </div>
         </div>
     )

@@ -24,6 +24,12 @@ import Settings from './components/Settings.jsx'
 import AdminLeaveList from './components/AdminLeaveList.jsx'
 import LeaveDetails from './components/LeaveDetails.jsx'
 import EmployeeLeaveList from './components/EmployeeLeaveList.jsx'
+import MyTimesheet from './components/MyTimesheet.jsx'
+import AdminTimesheetList from './components/AdminTimesheetList.jsx'
+import AdminTimesheetDetail from './components/AdminTimesheetDetail.jsx'
+import ProjectList from './components/ProjectList.jsx'
+import AddProject from './components/AddProject.jsx'
+import EditProject from './components/EditProject.jsx'
 
 function App() {
   return (
@@ -50,8 +56,13 @@ function App() {
               <Route path="/admin-dashboard/employees/edit/:id" element={<EditEmployee />} />
               <Route path="/admin-dashboard/employees/leaves/:id" element={<EmployeeLeaveList />} />
               <Route path="/admin-dashboard/salaries" element={<SalaryList />} />
+              <Route path="/admin-dashboard/add-project" element={<AddProject />} />
+              <Route path="/admin-dashboard/project/:id" element={<EditProject />} />
+              <Route path="/admin-dashboard/projects" element={<ProjectList />} />
               <Route path="/admin-dashboard/leaves/:id" element={<LeaveDetails />} />
               <Route path="/admin-dashboard/leaves" element={<AdminLeaveList />} />
+              <Route path="/admin-dashboard/timesheets" element={<AdminTimesheetList />} />
+              <Route path="/admin-dashboard/timesheets/:id" element={<AdminTimesheetDetail />} />
               <Route path="/admin-dashboard/settings" element={<Settings />} />
             </Route>
             <Route path="/employee-dashboard" element={
@@ -62,6 +73,7 @@ function App() {
               </PrivateRoutes>
             }>
               <Route index element={<Summary />} />
+              <Route path="/employee-dashboard/timesheet" element={<MyTimesheet />} />
               <Route path="/employee-dashboard/profile/:id" element={<ViewEmployee />} />
               <Route path="/employee-dashboard/leaves/:id" element={<LeaveDetails />} />
               <Route path="/employee-dashboard/leaves" element={<LeaveList />} />
