@@ -2,40 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 
-const pad2 = (n) => String(n).padStart(2, '0')
-
-function parseYmdLocal(ymd) {
-    const [y, m, da] = ymd.split('-').map(Number)
-    return new Date(y, m - 1, da, 0, 0, 0, 0)
-}
-
-function addDaysYmd(ymd, days) {
-    const dt = parseYmdLocal(ymd)
-    dt.setDate(dt.getDate() + days)
-    return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`
-}
-
-function formatDmY(ymd) {
-    const dt = parseYmdLocal(ymd)
-    return `${pad2(dt.getDate())}-${pad2(dt.getMonth() + 1)}-${dt.getFullYear()}`
-}
-
-function dayShortLabel(ymd) {
-    const dt = parseYmdLocal(ymd)
-    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    return `${dt.getDate()} ${names[dt.getDay()]}`
-}
-
-function formatHourDisplay(h) {
-    let n = Number(h)
-    if (!Number.isFinite(n)) n = 0
-    n = Math.round(n * 100) / 100
-    return String(n)
-}
-
-function sum(arr) {
-    return arr.reduce((a, b) => a + (Number(b) || 0), 0)
-}
+import { addDaysYmd, formatDmY, dayShortLabel, parseYmdLocal } from '../utils/dateUtils'
+import { formatHourDisplay, sum } from '../utils/timesheetUtils'
 
 const AdminTimesheetDetail = () => {
     const { id } = useParams()

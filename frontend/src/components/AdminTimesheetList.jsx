@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
 
-const formatDmY = (ymd) => {
-    if (!ymd) return ''
-    const [y, m, d] = ymd.split('-')
-    return `${d}-${m}-${y}`
-}
+import { formatDmY } from '../utils/dateUtils'
 
 const statusDisplay = (s) => {
     if (s === 'approved') return 'Approved'

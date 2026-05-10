@@ -1,70 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 
-const pad2 = (n) => String(n).padStart(2, '0')
-
-function mondayYmdFromDate(d) {
-    const x = new Date(d)
-    x.setHours(0, 0, 0, 0)
-    const day = x.getDay()
-    const diff = day === 0 ? -6 : 1 - day
-    x.setDate(x.getDate() + diff)
-    return `${x.getFullYear()}-${pad2(x.getMonth() + 1)}-${pad2(x.getDate())}`
-}
-
-function parseYmdLocal(ymd) {
-    const [y, m, da] = ymd.split('-').map(Number)
-    return new Date(y, m - 1, da, 0, 0, 0, 0)
-}
-
-function addDaysYmd(ymd, days) {
-    const dt = parseYmdLocal(ymd)
-    dt.setDate(dt.getDate() + days)
-    return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`
-}
-
-function formatDmY(ymd) {
-    const dt = parseYmdLocal(ymd)
-    return `${pad2(dt.getDate())}-${pad2(dt.getMonth() + 1)}-${dt.getFullYear()}`
-}
-
-function dayShortLabel(ymd) {
-    const dt = parseYmdLocal(ymd)
-    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    return `${dt.getDate()} ${names[dt.getDay()]}`
-}
-
-/** Display hours as plain numbers (8, 4.5, 0) — not clock time */
-function formatHourDisplay(h) {
-    let n = Number(h)
-    if (!Number.isFinite(n)) n = 0
-    n = Math.round(n * 100) / 100
-    if (Object.is(n, -0)) return '0'
-    return String(n)
-}
-
-function parseHourInput(raw) {
-    if (raw === '' || raw == null) return 0
-    const n = parseFloat(String(raw).replace(',', '.'))
-    if (!Number.isFinite(n)) return 0
-    return Math.min(24, Math.max(0, Math.round(n * 100) / 100))
-}
-
-function sum(arr) {
-    return arr.reduce((a, b) => a + (Number(b) || 0), 0)
-}
-
-function cloneRows(rows) {
-    return (rows ?? []).map((r) => ({
-        projectId: r.projectId != null && r.projectId !== '' ? String(r.projectId) : '',
-        project: r.project ?? '',
-        activity: r.activity ?? '',
-        hours: [...(r.hours ?? [0, 0, 0, 0, 0, 0, 0])].slice(0, 7).map((x) => {
-            const n = Number(x)
-            return Number.isFinite(n) ? Math.round(n * 100) / 100 : 0
-        }),
-    }))
-}
+import { mondayYmdFromDate, addDaysYmd, formatDmY, dayShortLabel, parseYmdLocal } from '../utils/dateUtils'
+import { formatHourDisplay, parseHourInput, sum, cloneRows } from '../utils/timesheetUtils'
 
 const MyTimesheet = () => {
     const [weekStart, setWeekStart] = useState(() => mondayYmdFromDate(new Date()))
